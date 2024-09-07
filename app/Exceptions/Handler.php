@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -43,11 +44,37 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $exception): JsonResponse
     {
+        if ($exception instanceof ClientError) {
+            $errorMessage = $exception->getMessage();
+            $errorStatusCode = $exception->getStatusCode();
+
+            Log::error('Client Error: ' . $errorMessage);
+
+            $response = [
+                'status' => 'fail',
+                'message' => $errorMessage,
+            ];
+            return response()->json($response, $errorStatusCode);
+        }
+
+        if ($exception instanceof ValidationException) {
+            $errorMessage = $exception->getMessage();
+
+            Log::error('Validation Error: ' . $errorMessage);
+
+            $response = [
+                'status' => 'fail',
+                'message' => $errorMessage,
+            ];
+            return response()->json($response, 400);
+        }
+
+        Log::error('There is something error: ' . $exception->getMessage());
+
         $response = [
             'status' => 'fail',
             'message' => 'There is something error on our server',
         ];
-        Log::error('There is something error here: ' . $exception->getMessage());
         return response()->json($response, 500);
     }
 }
