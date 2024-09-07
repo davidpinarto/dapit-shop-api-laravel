@@ -2,7 +2,9 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -37,5 +39,15 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    public function render($request, Throwable $exception): JsonResponse
+    {
+        $response = [
+            'status' => 'fail',
+            'message' => 'There is something error on our server',
+        ];
+        Log::error('There is something error here: ' . $exception->getMessage());
+        return response()->json($response, 500);
     }
 }
