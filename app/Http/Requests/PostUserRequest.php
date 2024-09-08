@@ -20,8 +20,10 @@ class PostUserRequest extends FormRequest
         return [
             'email.required' => 'Email wajib diisi',
             'email.unique' => 'Email yang Anda masukkan sudah digunakan',
+            'email.max' => 'Email tidak boleh lebih dari 255 karakter',
             'password.required' => 'Password wajib diisi',
             'fullName.required' => 'Nama lengkap wajib diisi',
+            'fullName.max' => 'Nama tidak boleh lebih dari 100 karakter'
         ];
     }
 }
